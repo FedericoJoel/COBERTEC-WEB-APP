@@ -817,11 +817,17 @@ angular.module('app.controllers', [])
     // }
 
     $scope.uploadFiles = function(file, errFiles) {
+
+			// File name only
+		 var d = new Date();
+		 tiempo = d.getTime();
+		 var filename = tiempo.toString() + '.jpg';
+
     $scope.f = file;
     $scope.errFile = errFiles && errFiles[0];
     if (file) {
       file.upload = Upload.upload({
-        url: 'ACA VA LA URL DEL UPLOAD',
+        url: 'http://www.gestionarturnos.com/uploadweb.php',
         data: {
         file: file
         }
