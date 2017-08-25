@@ -815,7 +815,7 @@ angular.module('app.controllers', [])
     //         $scope.color = "button-assertive"
     //     })
     // }
-
+    // http://jsfiddle.net/danialfarid/0mz6ff9o/135/
     $scope.uploadFiles = function(file, errFiles) {
       file.progress = 0
       $scope.f = file;
