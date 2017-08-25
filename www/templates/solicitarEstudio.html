@@ -1,28 +1,42 @@
 <ion-view title="<b>Solicitar estudio</b>" id="page13" class=" ">
-    <ion-content padding="true" class="has-header">
-        <ion-list id="solicitarTurno-list7" class=" ">
-            <!-- <ion-item class="item-avatar  " id="solicitarTurno-list-item34"> -->
-            <!-- <img src="img/Clinica.jpg">
+  <ion-content padding="true" class="has-header">
+    <ion-list id="solicitarTurno-list7" class=" ">
+      <!-- <ion-item class="item-avatar  " id="solicitarTurno-list-item34"> -->
+      <!-- <img src="img/Clinica.jpg">
                 <h2>{{clinica.NOMBRE}}</h2>
                 <p>{{clinica.DIRECCION}}</p>
                 <p>{{especialidad}}</p>
             </ion-item> -->
-            <label class="item item-input item-stacked-label " id="solicitarTurno-input3">
+      <label class="item item-input item-stacked-label " id="solicitarTurno-input3">
                 <span class="input-label">Medico/Clinica Sugerido</span>
                 <input type="text" placeholder="Puede sugerirnos un profecional o clinica" ng-model="$parent.sugerido">
-            </label>
-        </ion-list>
-        <div style="margin-right:-20px;">
+      </label>
+    </ion-list>
+    <div style="margin-right:-20px;">
 
-          <center>
-            <button type="file" ngf-select="uploadFiles($file, $invalidFiles)"
-          accept="image/*" ngf-max-height="1000" ngf-max-size="1MB">
-      Select File</button>
-          </center>
+      <center>
+        <button type="file" ngf-select="uploadFiles($file, $invalidFiles)" accept="image/*">
+          Seleccione una foto</button>
 
-            <button id="EnviarSolicitud" style="left:-10px;color:#FFFFFF;" class=" button {{color}}  button-full" ng-click='enviar()'><div class="{{icon}}"> {{confirmacion}}</div></button>
-        </div>
-            <!-- <center>{{confirmacion}}</center> -->
-                <!-- <center><img ng-src="{{srcImage || 'img/dummy.jpg'}}" id="srcImage" width="250 " height="250" style="display: block;  "></ceter> -->
-    </ion-content>
+
+      <div style="font:smaller">{{f.name}} {{errFile.name}} {{errFile.$error}} {{errFile.$errorParam}}
+        <span class="progress" ng-show="f.progress >= 0">
+          <div style="width:{{f.progress}}%"
+               ng-bind="f.progress + '%'">
+          </div>
+        </span>
+        <span ng-show="f.progress == 100">
+          <div>termino
+          </div>
+        </span>
+      </div>
+
+      {{errorMsg}}
+
+      <button id="EnviarSolicitud" style="left:-10px;color:#FFFFFF;" class=" button {{color}}  button-full" ng-click='enviar()'><div class="{{icon}}"> {{confirmacion}}</div></button>
+    </div>
+    </center>
+    <!-- <center>{{confirmacion}}</center> -->
+    <!-- <center><img ng-src="{{srcImage || 'img/dummy.jpg'}}" id="srcImage" width="250 " height="250" style="display: block;  "></ceter> -->
+  </ion-content>
 </ion-view>

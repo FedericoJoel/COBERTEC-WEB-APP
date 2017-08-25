@@ -790,7 +790,7 @@ angular.module('app.controllers', [])
 
 })
 
-.controller('solicitarEstudioCtrl', function(Upload,$scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory,$cordovaCamera,$cordovaFileTransfer) {
+.controller('solicitarEstudioCtrl', function($timeout,Upload,$scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory,$cordovaCamera,$cordovaFileTransfer) {
 
     // clinica = $stateParams.clinica;
     // $scope.especialidad = $stateParams.especialidad;
@@ -817,35 +817,67 @@ angular.module('app.controllers', [])
     // }
 
     $scope.uploadFiles = function(file, errFiles) {
+      file.progress = 0
+      $scope.f = file;
+      $scope.errFile = errFiles && errFiles[0];
+      if (file) {
 
-			// File name only
-		 var d = new Date();
-		 tiempo = d.getTime();
-		 var filename = tiempo.toString() + '.jpg';
+          file.upload = Upload.upload({
+              url: 'http://www.gestionarturnos.com/uploadweb.php',
+              data: {file: file}
+          });
 
-    $scope.f = file;
-    $scope.errFile = errFiles && errFiles[0];
-    if (file) {
-      file.upload = Upload.upload({
-        url: 'http://www.gestionarturnos.com/uploadweb.php',
-        data: {
-        file: file
-        }
-      });
-
-      file.upload.then(function(response) {
-        $timeout(function() {
-          file.result = response.data;
-        });
-      }, function(response) {
-        if (response.status > 0)
-          $scope.errorMsg = response.status + ': ' + response.data;
-      }, function(evt) {
-        file.progress = Math.min(100, parseInt(100.0 *
-          evt.loaded / evt.total));
-      });
-    }
+          file.upload.then(function (response) {
+              $timeout(function () {
+                  file.result = response.data;
+              });
+          }, function (response) {
+              if (response.status > 0)
+                  $scope.errorMsg = response.status + ': ' + response.data;
+          }, function (evt) {
+              file.progress = Math.min(100, parseInt(100.0 *
+                                       evt.loaded / evt.total));
+          });
+      }
   }
+
+
+
+
+
+  //   $scope.uploadFiles = function(file, errFiles) {
+  //     console.log("entro al uploadFiles");
+	// 		// File name only
+	// 	 var d = new Date();
+	// 	 tiempo = d.getTime();
+	// 	 var filename = tiempo.toString() + '.jpg';
+  //
+  //   $scope.f = file;
+  //   $scope.errFile = errFiles && errFiles[0];
+  //
+  //   if (file) {
+  //     console.log('entro al file');
+  //     file.upload = Upload.upload({
+  //       url: 'http://www.gestionarturnos.com/uploadweb.php',
+  //       data: {
+  //       file: file
+  //       }
+  //     });
+  //
+  //     file.upload.then(function(response) {
+  //       $timeout(function() {
+  //         file.result = response.data;
+  //       });
+  //     }, function(response) {
+  //       if (response.status > 0)
+  //         $scope.errorMsg = response.status + ': ' + response.data;
+  //         console.log($scope.errorMsg);
+  //     }, function(evt) {
+  //       file.progress = Math.min(100, parseInt(100.0 *
+  //         evt.loaded / evt.total));
+  //     });
+  //   }
+  // }
 
 
     $scope.enviar = function(){
