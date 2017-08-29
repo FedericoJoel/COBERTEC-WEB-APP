@@ -1,231 +1,269 @@
 angular.module('app.controllers', [])
 
-.controller('loginCtrl', function($scope,UserSrv,$ionicPopup,$state,$http,$ionicScrollDelegate) {
-	$scope.data = {};
+  .controller('loginCtrl', function($scope, UserSrv, $ionicPopup, $state, $http, $ionicScrollDelegate) {
+    $scope.data = {};
 
-    $scope.scroll = function(){
+    $scope.scroll = function() {
 
-        $ionicScrollDelegate.scrollBottom();
+      $ionicScrollDelegate.scrollBottom();
     }
 
-	$scope.login = function(){
-        //ruta = UserSrv.getPath();
+    $scope.login = function() {
+      //ruta = UserSrv.getPath();
 
-        if (!$scope.data.dni || !$scope.data.nafiliado) {
-            var alertPopup = $ionicPopup.alert({
-                title: 'Debe completar los campos',
+      if (!$scope.data.dni || !$scope.data.nafiliado) {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Debe completar los campos',
 
-            });
-        }else{
+        });
+      } else {
 
-            UserSrv.showLoading();
-
-            $http.post( UserSrv.getPath() + "/login.php", {'dni':$scope.data.dni, 'nafiliado':$scope.data.nafiliado})
-                .success(function(response) {
-                    if (response.validacion=="success") {
-                        UserSrv.setDNI($scope.data.dni);
-                        var dni = UserSrv.getDNI();
-                        UserSrv.setNsocio($scope.data.nafiliado);
-                        UserSrv.hideLoading();
-                        $state.go('menu.t_pendientes');
-                    }else{
-                        UserSrv.hideLoadingerror("Combinacion de usuario y contraseña incorrectos");
-                    }
-                })
-                .error(function(data) {
-                    UserSrv.hideLoadingerror("Error de conexion");
-                });
-        }
-	}
-
-    $scope.invitado = function(){
-        //ruta = UserSrv.getPath();
-            UserSrv.showLoading();
-
-            $http.post( UserSrv.getPath() + "/login.php", {'dni':1  , 'nafiliado':2})
-                .success(function(response) {
-                    if (response.validacion=="success") {
-                        UserSrv.setDNI(1);
-                        var dni = UserSrv.getDNI();
-                        UserSrv.setNsocio(2);
-                        UserSrv.hideLoading();
-                        $state.go('menu.t_pendientes');
-                    }else{
-                        UserSrv.hideLoadingerror("Tenemos problemas para ingresar como invitado en este momento, intenta mas tarde.");
-                    }
-                })
-                .error(function(data) {
-                    UserSrv.hideLoadingerror("Verifica tu conexion a internet");
-                });
-    }
-
-
-})
-
-.controller('t_pendientesCtrl', function($scope,UserSrv,$state,$http) {
-
-
-    $scope.listar = function(){
-        var dni = UserSrv.getDNI();
-
-
-        // EN ESPERA
         UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/1.php", {'dni':dni, 'estado':'En Espera', 'confimarcion':0, 'tipo':'Turno' })
+
+        $http.post(UserSrv.getPath() + "/login.php", {
+            'dni': $scope.data.dni,
+            'nafiliado': $scope.data.nafiliado
+          })
+          .success(function(response) {
+            if (response.validacion == "success") {
+              UserSrv.setDNI($scope.data.dni);
+              var dni = UserSrv.getDNI();
+              UserSrv.setNsocio($scope.data.nafiliado);
+              UserSrv.hideLoading();
+              $state.go('menu.t_pendientes');
+            } else {
+              UserSrv.hideLoadingerror("Combinacion de usuario y contraseña incorrectos");
+            }
+          })
+          .error(function(data) {
+            UserSrv.hideLoadingerror("Error de conexion");
+          });
+      }
+    }
+
+    $scope.invitado = function() {
+      //ruta = UserSrv.getPath();
+      UserSrv.showLoading();
+
+      $http.post(UserSrv.getPath() + "/login.php", {
+          'dni': 1,
+          'nafiliado': 2
+        })
+        .success(function(response) {
+          if (response.validacion == "success") {
+            UserSrv.setDNI(1);
+            var dni = UserSrv.getDNI();
+            UserSrv.setNsocio(2);
+            UserSrv.hideLoading();
+            $state.go('menu.t_pendientes');
+          } else {
+            UserSrv.hideLoadingerror("Tenemos problemas para ingresar como invitado en este momento, intenta mas tarde.");
+          }
+        })
+        .error(function(data) {
+          UserSrv.hideLoadingerror("Verifica tu conexion a internet");
+        });
+    }
+
+
+  })
+
+  .controller('t_pendientesCtrl', function($scope, UserSrv, $state, $http) {
+
+
+    $scope.listar = function() {
+      var dni = UserSrv.getDNI();
+
+
+      // EN ESPERA
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/1.php", {
+          'dni': dni,
+          'estado': 'En Espera',
+          'confimarcion': 0,
+          'tipo': 'Turno'
+        })
 
         .success(function(response) {
-            if (typeof response == "string") {
-                $scope.solicitudesEspera = [];
-            }
-            else{
-               $scope.solicitudesEspera = response;
-            }
+          if (typeof response == "string") {
+            $scope.solicitudesEspera = [];
+          } else {
+            $scope.solicitudesEspera = response;
+          }
 
-            console.log($scope.solicitudesEspera);
-            UserSrv.hideLoading();
+          console.log($scope.solicitudesEspera);
+          UserSrv.hideLoading();
         })
 
 
-        // PENDIENTES Y ABIERTOS
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/1.php", {'dni':dni, 'estado':'Pendiente', 'tipo':'Pendiente' })
+      // PENDIENTES Y ABIERTOS
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/1.php", {
+          'dni': dni,
+          'estado': 'Pendiente',
+          'tipo': 'Pendiente'
+        })
 
         .success(function(response) {
-            if (typeof response == "string"){
-                $scope.solicitudesPendiente = [];
-            }
-            else{
-                $scope.solicitudesPendiente = response;
-            }
-            console.log(response);
-            UserSrv.hideLoading();
+          if (typeof response == "string") {
+            $scope.solicitudesPendiente = [];
+          } else {
+            $scope.solicitudesPendiente = response;
+          }
+          console.log(response);
+          UserSrv.hideLoading();
         })
 
     }
 
-    $scope.refresh = function(){
-        var dni = UserSrv.getDNI();
+    $scope.refresh = function() {
+      var dni = UserSrv.getDNI();
 
 
-        // EN ESPERA
-        $http.post( UserSrv.getPath() + "/1.php", {'dni':dni, 'estado':'En Espera', 'confimarcion':0, 'tipo':'Turno' })
+      // EN ESPERA
+      $http.post(UserSrv.getPath() + "/1.php", {
+          'dni': dni,
+          'estado': 'En Espera',
+          'confimarcion': 0,
+          'tipo': 'Turno'
+        })
 
         .success(function(response) {
-            if (typeof response == "string") {
-                $scope.solicitudesEspera = [];
-            }
-            else{
-               $scope.solicitudesEspera = response;
-            }
-            console.log(response);
+          if (typeof response == "string") {
+            $scope.solicitudesEspera = [];
+          } else {
+            $scope.solicitudesEspera = response;
+          }
+          console.log(response);
         })
 
 
-        // PENDIENTES Y ABIERTOS
-        $http.post( UserSrv.getPath() + "/1.php", {'dni':dni, 'estado':'Pendiente', 'tipo':'Pendiente' })
+      // PENDIENTES Y ABIERTOS
+      $http.post(UserSrv.getPath() + "/1.php", {
+          'dni': dni,
+          'estado': 'Pendiente',
+          'tipo': 'Pendiente'
+        })
 
         .success(function(response) {
-            if (typeof response == "string"){
-                $scope.solicitudesPendiente = [];
-            }
-            else{
-                $scope.solicitudesPendiente = response;
-            }
-            console.log(response);
+          if (typeof response == "string") {
+            $scope.solicitudesPendiente = [];
+          } else {
+            $scope.solicitudesPendiente = response;
+          }
+          console.log(response);
         })
 
     }
 
-    $scope.confirmar = function(id){
-        $state.go('menu.confirmacionSolicitud',{id:id});
+    $scope.confirmar = function(id) {
+      $state.go('menu.confirmacionSolicitud', {
+        id: id
+      });
     }
 
     $scope.doRefresh = function() {
 
-        console.log('Refreshing!');
+      console.log('Refreshing!');
 
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
     };
 
     $scope.listar();
 
-})
+  })
 
-.controller('t_confirmadosCtrl', function($scope,UserSrv,$state,$http) {
+  .controller('t_confirmadosCtrl', function($scope, UserSrv, $state, $http) {
 
-    $scope.listar = function(){
-        var dni = UserSrv.getDNI();
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/1.php", {'dni':dni, 'estado':'Confirmado', 'confirmacion':2, 'tipo':'Turno' })
+    $scope.listar = function() {
+      var dni = UserSrv.getDNI();
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/1.php", {
+          'dni': dni,
+          'estado': 'Confirmado',
+          'confirmacion': 2,
+          'tipo': 'Turno'
+        })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.solicitudes = response;
-            console.log($scope.solicitudes);
+          UserSrv.hideLoading();
+          $scope.solicitudes = response;
+          console.log($scope.solicitudes);
         })
     }
 
-    $scope.refresh = function(){
-        var dni = UserSrv.getDNI();
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/1.php", {'dni':dni, 'estado':'Confirmado', 'confirmacion':2, 'tipo':'Turno' })
-
-        .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.solicitudes = response;
-            console.log($scope.solicitudes);
+    $scope.refresh = function() {
+      var dni = UserSrv.getDNI();
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/1.php", {
+          'dni': dni,
+          'estado': 'Confirmado',
+          'confirmacion': 2,
+          'tipo': 'Turno'
         })
-    }
-
-    $scope.doRefresh = function() {
-
-        console.log('Refreshing!');
-
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
-    };
-
-    $scope.listar();
-})
-
-.controller('t_rechazadosCtrl', function($scope,UserSrv,$state,$http) {
-
-    $scope.listar = function(){
-        var dni = UserSrv.getDNI();
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/1.php", {'dni':dni, 'tipo':'Rechazado'  })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.solicitudes = response;
-            console.log($scope.solicitudes);
-        })
-    }
-
-    $scope.refresh = function(){
-        var dni = UserSrv.getDNI();
-        $http.post( UserSrv.getPath() + "/1.php", {'dni':dni, 'tipo':'Rechazado'  })
-
-        .success(function(response) {
-            $scope.solicitudes = response;
-            console.log($scope.solicitudes);
+          UserSrv.hideLoading();
+          $scope.solicitudes = response;
+          console.log($scope.solicitudes);
         })
     }
 
     $scope.doRefresh = function() {
 
-        console.log('Refreshing!');
+      console.log('Refreshing!');
 
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
+    };
+
+    $scope.listar();
+  })
+
+  .controller('t_rechazadosCtrl', function($scope, UserSrv, $state, $http) {
+
+    $scope.listar = function() {
+      var dni = UserSrv.getDNI();
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/1.php", {
+          'dni': dni,
+          'tipo': 'Rechazado'
+        })
+
+        .success(function(response) {
+          UserSrv.hideLoading();
+          $scope.solicitudes = response;
+          console.log($scope.solicitudes);
+        })
+    }
+
+    $scope.refresh = function() {
+      var dni = UserSrv.getDNI();
+      $http.post(UserSrv.getPath() + "/1.php", {
+          'dni': dni,
+          'tipo': 'Rechazado'
+        })
+
+        .success(function(response) {
+          $scope.solicitudes = response;
+          console.log($scope.solicitudes);
+        })
+    }
+
+    $scope.doRefresh = function() {
+
+      console.log('Refreshing!');
+
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
     };
 
     $scope.listar();
 
-})
+  })
 
-.controller('busquedaPorPartidoCtrl', function($scope,$http,$state,$stateParams,UserSrv,$ionicNavBarDelegate) {
+  .controller('busquedaPorPartidoCtrl', function($scope, $http, $state, $stateParams, UserSrv, $ionicNavBarDelegate) {
 
     esp = $stateParams.especialidad;
     tipo = $stateParams.tipo;
@@ -234,21 +272,25 @@ angular.module('app.controllers', [])
 
     $ionicNavBarDelegate.showBackButton(true);
 
-    $scope.listarLocalidades = function(){
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/listarLocalidades.php", {'especialidad':esp})
+    $scope.listarLocalidades = function() {
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/listarLocalidades.php", {
+          'especialidad': esp
+        })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.localidades = response;
+          UserSrv.hideLoading();
+          $scope.localidades = response;
         })
     }
 
-    $scope.refresh = function(){
-        $http.post( UserSrv.getPath() + "/listarLocalidades.php", {'especialidad':esp})
+    $scope.refresh = function() {
+      $http.post(UserSrv.getPath() + "/listarLocalidades.php", {
+          'especialidad': esp
+        })
 
         .success(function(response) {
-            $scope.localidades = response;
+          $scope.localidades = response;
         })
     }
 
@@ -256,86 +298,104 @@ angular.module('app.controllers', [])
 
     $scope.doRefresh = function() {
 
-        console.log('Refreshing!');
+      console.log('Refreshing!');
 
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
     };
 
-    $scope.elegirLocalidad = function(localidad){
-        $state.go('menu.listaDeClinicas',{localidad:localidad, especialidad:esp,tipo:tipo});
+    $scope.elegirLocalidad = function(localidad) {
+      $state.go('menu.listaDeClinicas', {
+        localidad: localidad,
+        especialidad: esp,
+        tipo: tipo
+      });
     }
 
-})
+  })
 
-.controller('clinicasYParticularesCtrl', function($scope) {})
+  .controller('clinicasYParticularesCtrl', function($scope) {})
 
-.controller('listaDeClinicasCtrl', function($scope,$http,$state,$stateParams,UserSrv) {
+  .controller('listaDeClinicasCtrl', function($scope, $http, $state, $stateParams, UserSrv) {
 
     localidad = $stateParams.localidad;
     especialidad = $stateParams.especialidad;
     tipo = $stateParams.tipo;
 
-    $scope.listar = function(){
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/listarClinicas.php", {'localidad':localidad,'especialidad':especialidad})
+    $scope.listar = function() {
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/listarClinicas.php", {
+          'localidad': localidad,
+          'especialidad': especialidad
+        })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.clinicas = response;
-            console.log(response);
+          UserSrv.hideLoading();
+          $scope.clinicas = response;
+          console.log(response);
         })
     }
 
-    $scope.refresh = function(){
-        localidad = $stateParams.localidad;
-        especialidad = $stateParams.especialidad;
+    $scope.refresh = function() {
+      localidad = $stateParams.localidad;
+      especialidad = $stateParams.especialidad;
 
-        $http.post( UserSrv.getPath() + "/listarClinicas.php", {'localidad':localidad,'especialidad':especialidad})
+      $http.post(UserSrv.getPath() + "/listarClinicas.php", {
+          'localidad': localidad,
+          'especialidad': especialidad
+        })
 
         .success(function(response) {
-            $scope.clinicas = response;
-            console.log(response);
+          $scope.clinicas = response;
+          console.log(response);
         })
     }
 
     $scope.listar();
 
 
-    $scope.elegirClinica = function(clinica){
+    $scope.elegirClinica = function(clinica) {
 
-        if (especialidad == 'Clinico'){
-            $state.go('menu.solicitarTurno',{clinica:clinica});
-        }
-        else if(tipo == '2'){
-            $state.go('menu.solicitarEspecialista',{clinica:clinica, especialidad:especialidad});
-        }
-        else {
-            $state.go('menu.solicitarEstudio',{clinica:clinica, especialidad:especialidad});
-        }
+      if (especialidad == 'Clinico') {
+        $state.go('menu.solicitarTurno', {
+          clinica: clinica
+        });
+      } else if (tipo == '2') {
+        $state.go('menu.solicitarEspecialista', {
+          clinica: clinica,
+          especialidad: especialidad
+        });
+      } else {
+        $state.go('menu.solicitarEstudio', {
+          clinica: clinica,
+          especialidad: especialidad
+        });
+      }
 
     }
 
     $scope.doRefresh = function() {
 
-        console.log('Refreshing!');
+      console.log('Refreshing!');
 
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
     };
 
-})
+  })
 
-.controller('solicitarTurnoCtrl', function($scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory) {
+  .controller('solicitarTurnoCtrl', function($scope, UserSrv, $stateParams, $state, $http, $ionicPopup, $ionicHistory) {
 
-    $scope.listar = function(){
-        clinica = $stateParams.clinica;
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/mostrarClinica.php", {'clinica':clinica})
+    $scope.listar = function() {
+      clinica = $stateParams.clinica;
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/mostrarClinica.php", {
+          'clinica': clinica
+        })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.clinica = response;
+          UserSrv.hideLoading();
+          $scope.clinica = response;
         })
     }
 
@@ -343,203 +403,237 @@ angular.module('app.controllers', [])
     $scope.listar();
 
 
-    $scope.enviar = function(){
+    $scope.enviar = function() {
 
-        clinica = $stateParams.clinica;
-        dni = UserSrv.getDNI();
-        carnet = UserSrv.getNsocio();
-        sugerido = $scope.sugerido;
+      clinica = $stateParams.clinica;
+      dni = UserSrv.getDNI();
+      carnet = UserSrv.getNsocio();
+      sugerido = $scope.sugerido;
 
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/altaSolicitud.php", {'clinica':clinica,'dni':dni,'nafiliado':carnet,'sugerido':sugerido,'especialidad':1})
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/altaSolicitud.php", {
+          'clinica': clinica,
+          'dni': dni,
+          'nafiliado': carnet,
+          'sugerido': sugerido,
+          'especialidad': 1
+        })
 
         .success(function() {
-            UserSrv.hideLoadingerror("Su solicitud se ha enviado con exito");
+          UserSrv.hideLoadingerror("Su solicitud se ha enviado con exito");
 
-            $scope.sugerido = "";
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-            $state.go('menu.t_pendientes');
+          $scope.sugerido = "";
+          $ionicHistory.nextViewOptions({
+            disableBack: true
+          });
+          $state.go('menu.t_pendientes');
 
 
         })
     }
 
-})
+  })
 
-.controller('confirmacionSolicitud', function($scope,$http,$state,$stateParams,UserSrv) {
+  .controller('confirmacionSolicitud', function($scope, $http, $state, $stateParams, UserSrv) {
 
-    $scope.listar = function(){
-        id = $stateParams.id;
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/mostrarsolicitud.php", {'id':id})
+    $scope.listar = function() {
+      id = $stateParams.id;
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/mostrarsolicitud.php", {
+          'id': id
+        })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.solicitud = response;
+          UserSrv.hideLoading();
+          $scope.solicitud = response;
         })
     }
 
     $scope.listar();
 
-    $scope.refresh = function(){
-        id = $stateParams.id;
-        $http.post( UserSrv.getPath() + "/mostrarsolicitud.php", {'id':id})
+    $scope.refresh = function() {
+      id = $stateParams.id;
+      $http.post(UserSrv.getPath() + "/mostrarsolicitud.php", {
+          'id': id
+        })
 
         .success(function(response) {
-            $scope.solicitud = response;
+          $scope.solicitud = response;
         })
     }
 
     $scope.doRefresh = function() {
 
-        console.log('Refreshing!');
+      console.log('Refreshing!');
 
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
     };
 
-    $scope.confirmar = function(){
-        id = $stateParams.id;
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/confirmacionSolicitud.php", {'idsolicitud':id, 'accion':'confirmar','motivo':$scope.motivo})
+    $scope.confirmar = function() {
+      id = $stateParams.id;
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/confirmacionSolicitud.php", {
+          'idsolicitud': id,
+          'accion': 'confirmar',
+          'motivo': $scope.motivo
+        })
 
         .success(function() {
-            UserSrv.hideLoadingerror("Su solicitud se ha enviado con exito");
-            $scope.motivo = "";
-            // $ionicHistory.nextViewOptions({
-            //     disableBack: true
-            // });
-            $state.go('menu.t_pendientes');
+          UserSrv.hideLoadingerror("Su solicitud se ha enviado con exito");
+          $scope.motivo = "";
+          // $ionicHistory.nextViewOptions({
+          //     disableBack: true
+          // });
+          $state.go('menu.t_pendientes');
 
         })
     }
 
-    $scope.rechazar = function(){
-        id = $stateParams.id;
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/confirmacionSolicitud.php", {'idsolicitud':id, 'accion':'rechazar','motivo':$scope.motivo})
+    $scope.rechazar = function() {
+      id = $stateParams.id;
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/confirmacionSolicitud.php", {
+          'idsolicitud': id,
+          'accion': 'rechazar',
+          'motivo': $scope.motivo
+        })
 
         .success(function(response) {
-            UserSrv.hideLoadingerror("Se solicito el cambio de fecha, a la brevedad recibira un nuevo turno");
-            $scope.motivo = "";
-            $scope.solicitud = response;
-            $state.go('menu.t_pendientes');
+          UserSrv.hideLoadingerror("Se solicito el cambio de fecha, a la brevedad recibira un nuevo turno");
+          $scope.motivo = "";
+          $scope.solicitud = response;
+          $state.go('menu.t_pendientes');
         })
     }
 
-})
+  })
 
-.controller('particularesCtrl', function($scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory) {
+  .controller('particularesCtrl', function($scope, UserSrv, $stateParams, $state, $http, $ionicPopup, $ionicHistory) {
 
 
-    $scope.listar = function(){
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/cartilla.php", {'tabla':'Climed'})
+    $scope.listar = function() {
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/cartilla.php", {
+          'tabla': 'Climed'
+        })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.clinicas = response;
-            console.log(response);
+          UserSrv.hideLoading();
+          $scope.clinicas = response;
+          console.log(response);
         })
     }
 
-    $scope.refresh = function(){
+    $scope.refresh = function() {
 
-        $http.post( UserSrv.getPath() + "/cartilla.php", {'tabla':'Climed'})
-
-        .success(function(response) {
-            $scope.clinicas = response;
-            console.log(response);
+      $http.post(UserSrv.getPath() + "/cartilla.php", {
+          'tabla': 'Climed'
         })
-    }
-
-    $scope.listar();
-
-
-    $scope.elegirClinica = function(clinica){
-
-        $state.go('menu.infoClinica',{clinica:clinica});
-
-    }
-
-    $scope.doRefresh = function() {
-
-        console.log('Refreshing!');
-
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
-    };
-
-})
-
-
-.controller('clinicasCtrl', function($scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory) {
-
-
-    $scope.listar = function(){
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/cartilla.php", {'tabla':'Climed'})
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.clinicas = response;
-            console.log(response);
-        })
-    }
-
-    $scope.refresh = function(){
-
-        $http.post( UserSrv.getPath() + "/cartilla.php", {'tabla':'Climed'})
-
-        .success(function(response) {
-            $scope.clinicas = response;
-            console.log(response);
+          $scope.clinicas = response;
+          console.log(response);
         })
     }
 
     $scope.listar();
 
 
-    $scope.elegirClinica = function(clinica){
+    $scope.elegirClinica = function(clinica) {
 
-        $state.go('menu.infoClinica',{clinica:clinica});
+      $state.go('menu.infoClinica', {
+        clinica: clinica
+      });
 
     }
 
     $scope.doRefresh = function() {
 
-        console.log('Refreshing!');
+      console.log('Refreshing!');
 
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
     };
 
-})
+  })
 
 
-.controller('farmaciasCtrl', function($scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory) {
+  .controller('clinicasCtrl', function($scope, UserSrv, $stateParams, $state, $http, $ionicPopup, $ionicHistory) {
 
 
-    $scope.listar = function(){
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/cartilla.php", {'tabla':'Farmacias'})
+    $scope.listar = function() {
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/cartilla.php", {
+          'tabla': 'Climed'
+        })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.farmacias = response;
-            console.log(response);
+          UserSrv.hideLoading();
+          $scope.clinicas = response;
+          console.log(response);
         })
     }
 
-    $scope.refresh = function(){
+    $scope.refresh = function() {
 
-        $http.post( UserSrv.getPath() + "/cartilla.php", {'tabla':'Farmacias'})
+      $http.post(UserSrv.getPath() + "/cartilla.php", {
+          'tabla': 'Climed'
+        })
 
         .success(function(response) {
-            $scope.farmacias = response;
-            console.log(response);
+          $scope.clinicas = response;
+          console.log(response);
+        })
+    }
+
+    $scope.listar();
+
+
+    $scope.elegirClinica = function(clinica) {
+
+      $state.go('menu.infoClinica', {
+        clinica: clinica
+      });
+
+    }
+
+    $scope.doRefresh = function() {
+
+      console.log('Refreshing!');
+
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
+    };
+
+  })
+
+
+  .controller('farmaciasCtrl', function($scope, UserSrv, $stateParams, $state, $http, $ionicPopup, $ionicHistory) {
+
+
+    $scope.listar = function() {
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/cartilla.php", {
+          'tabla': 'Farmacias'
+        })
+
+        .success(function(response) {
+          UserSrv.hideLoading();
+          $scope.farmacias = response;
+          console.log(response);
+        })
+    }
+
+    $scope.refresh = function() {
+
+      $http.post(UserSrv.getPath() + "/cartilla.php", {
+          'tabla': 'Farmacias'
+        })
+
+        .success(function(response) {
+          $scope.farmacias = response;
+          console.log(response);
         })
     }
 
@@ -547,39 +641,43 @@ angular.module('app.controllers', [])
 
     $scope.doRefresh = function() {
 
-        console.log('Refreshing!');
+      console.log('Refreshing!');
 
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
     };
 
-})
+  })
 
-.controller('infoClinicaCtrl', function($scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory) {
+  .controller('infoClinicaCtrl', function($scope, UserSrv, $stateParams, $state, $http, $ionicPopup, $ionicHistory) {
 
-    $scope.listar = function(){
-        clinica = $stateParams.clinica;
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/mostrarClinica.php", {'clinica':clinica})
+    $scope.listar = function() {
+      clinica = $stateParams.clinica;
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/mostrarClinica.php", {
+          'clinica': clinica
+        })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.clinica = response;
+          UserSrv.hideLoading();
+          $scope.clinica = response;
         })
 
     }
 
-    $scope.listarEsp = function(){
+    $scope.listarEsp = function() {
 
-        clinica = $stateParams.clinica;
-        UserSrv.showLoading();
+      clinica = $stateParams.clinica;
+      UserSrv.showLoading();
 
-        $http.post( UserSrv.getPath() + "/listarEspecialidades.php", {'clinica':clinica})
+      $http.post(UserSrv.getPath() + "/listarEspecialidades.php", {
+          'clinica': clinica
+        })
 
         .success(function(response) {
-                    console.log(response);
-            UserSrv.hideLoading();
-            $scope.especialidades = response;
+          console.log(response);
+          UserSrv.hideLoading();
+          $scope.especialidades = response;
         })
 
     }
@@ -588,71 +686,83 @@ angular.module('app.controllers', [])
 
     $scope.listarEsp();
 
-})
+  })
 
-.controller('recomendarCtrl', function($scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory) {
+  .controller('recomendarCtrl', function($scope, UserSrv, $stateParams, $state, $http, $ionicPopup, $ionicHistory) {
 
-    $scope.enviar = function(){
+    $scope.enviar = function() {
 
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/altaRecomendacion.php", {'nombre':$scope.nombre,'apellido':$scope.apellido,'nro':$scope.nro})
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/altaRecomendacion.php", {
+          'nombre': $scope.nombre,
+          'apellido': $scope.apellido,
+          'nro': $scope.nro
+        })
 
         .success(function() {
-            UserSrv.hideLoadingerror("Su recomendacion se envio correctamente. Sera contactado a la brevedad.");
-            $scope.clearContent();
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-            $state.go('menu.t_pendientes');
+          UserSrv.hideLoadingerror("Su recomendacion se envio correctamente. Sera contactado a la brevedad.");
+          $scope.clearContent();
+          $ionicHistory.nextViewOptions({
+            disableBack: true
+          });
+          $state.go('menu.t_pendientes');
         })
     }
 
-    $scope.clearContent = function(){
-        $scope.nombre = "";
-        $scope.apellido = "";
-        $scope.nro = "";
+    $scope.clearContent = function() {
+      $scope.nombre = "";
+      $scope.apellido = "";
+      $scope.nro = "";
     }
 
-})
+  })
 
-.controller('contactoCtrl', function($scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory) {
+  .controller('contactoCtrl', function($scope, UserSrv, $stateParams, $state, $http, $ionicPopup, $ionicHistory) {
 
-    $scope.enviar = function(){
+    $scope.enviar = function() {
 
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/altaRecomendacion.php", {'nombre':$scope.nombre,'apellido':$scope.apellido,'nro':$scope.nro})
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/altaRecomendacion.php", {
+          'nombre': $scope.nombre,
+          'apellido': $scope.apellido,
+          'nro': $scope.nro
+        })
 
         .success(function() {
-            UserSrv.hideLoadingerror("Su recomendacion se envio correctamente. Sera contactado a la brevedad.");
+          UserSrv.hideLoadingerror("Su recomendacion se envio correctamente. Sera contactado a la brevedad.");
 
-            $ionicHistory.nextViewOptions({
-                disableBack: true
-            });
-            $state.go('menu.t_pendientes');
+          $ionicHistory.nextViewOptions({
+            disableBack: true
+          });
+          $state.go('menu.t_pendientes');
 
 
         })
     }
 
-})
+  })
 
-.controller('seleccionEspecialidadCtrl', function($scope,$http,$state,$stateParams,UserSrv,$ionicHistory,$location) {
+  .controller('seleccionEspecialidadCtrl', function($scope, $http, $state, $stateParams, UserSrv, $ionicHistory, $location) {
 
-    $scope.listarEspecialidades = function(){
-        UserSrv.showLoading();
-       $http.post( UserSrv.getPath() + "/listarEspecialidadoEstudio.php", {'tipo':'especialidad'})
+    $scope.listarEspecialidades = function() {
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/listarEspecialidadoEstudio.php", {
+          'tipo': 'especialidad'
+        })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.especialidades = response;
+          UserSrv.hideLoading();
+          $scope.especialidades = response;
         })
     }
 
-    $scope.refresh = function(){
-        $http.post( UserSrv.getPath() + "/listarEspecialidadoEstudio.php", {'tipo':'especialidad'})
+    $scope.refresh = function() {
+      $http.post(UserSrv.getPath() + "/listarEspecialidadoEstudio.php", {
+          'tipo': 'especialidad'
+        })
 
         .success(function(response) {
-            $scope.especialidades = response;
+          $scope.especialidades = response;
         })
     }
 
@@ -660,330 +770,364 @@ angular.module('app.controllers', [])
 
     $scope.doRefresh = function() {
 
-        console.log('Refreshing!');
+      console.log('Refreshing!');
 
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
     };
 
 
-    $scope.elegirEspecialidad = function(especialidad){
-        $state.go('menu.busquedaPorPartido', {especialidad:especialidad,tipo:'2'});
+    $scope.elegirEspecialidad = function(especialidad) {
+      $state.go('menu.busquedaPorPartido', {
+        especialidad: especialidad,
+        tipo: '2'
+      });
     }
 
-})
+  })
 
-.controller('solicitarEspecialistaCtrl', function($scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory,$cordovaCamera,$cordovaFileTransfer) {
+  .controller('solicitarEspecialistaCtrl', function(Upload, $scope, UserSrv, $stateParams, $state, $http, $ionicPopup, $ionicHistory, $cordovaCamera, $cordovaFileTransfer) {
+
 
     clinica = $stateParams.clinica;
     $scope.especialidad = $stateParams.especialidad;
-    console.log($scope.especialidad);
     dni = UserSrv.getDNI();
     carnet = UserSrv.getNsocio();
     sugerido = $scope.sugerido;
-    console.log($scope.especialidad);
 
-    $scope.srcImage = "";
-
-    $scope.listar = function(){
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/mostrarClinica.php", {'clinica':clinica})
+    $scope.listar = function() {
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/mostrarClinica.php", {
+          'clinica': clinica
+        })
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.clinica = response;
-            $scope.confirmacion = " Debe tomar una foto";
-            $scope.icon = "icon ion-close-round";
-            $scope.color = "button-assertive"
+          UserSrv.hideLoading();
+          $scope.clinica = response;
         })
     }
 
     $scope.listar();
 
-    $scope.tomarFoto = function(){
+    $scope.uploadPic = function(file) {
 
-        var options = {
-            quality: 80,
-            destinationType: Camera.DestinationType.DATA_URL,
-            sourceType: Camera.PictureSourceType.CAMERA,
-            allowEdit: true,
-            encodingType: Camera.EncodingType.JPEG,
-            targetWidth: 250,
-            targetHeight: 250,
-            popoverOptions: CameraPopoverOptions,
-            saveToPhotoAlbum: false
-        };
+      var d = new Date();
+      tiempo = d.getTime();
+      var filename = tiempo.toString() + UserSrv.getDNI().toString() + '.jpg';
+      console.log('comienza a cargar la foto');
+      UserSrv.showLoading();
 
-        $cordovaCamera.getPicture(options).then(function(imageData) {
-            $scope.srcImage = "data:image/jpeg;base64," + imageData;
-            $scope.icon="ion-checkmark-round";
-            $scope.color="button-balanced";
-            $scope.confirmacion=" Enviar solicitud";
+      var filerenamed = Upload.rename(file, filename);
+      file.upload = Upload.upload({
+        url: 'http://www.gestionarturnos.com/uploadweb.php',
+        data: {
+          username: $scope.username,
+          file: filerenamed
+        },
+      });
 
-        }, function(err) {
-            // error
-        });
+      file.upload.then(function(response) {
 
-    }
+        $http.post(UserSrv.getPath() + "/altaEspecialidadEstudio.php", {
+            'clinica': clinica,
+            'dni': dni,
+            'nafiliado': carnet,
+            'sugerido': $scope.sugerido,
+            'especialidad': $scope.especialidad,
+            'tipo': '2',
+            'foto': filename
+          })
 
-    $scope.enviar = function(){
+          .success(function() {
+            UserSrv.hideLoadingerror("Tu solicitud fue enviada correctamente");
+            $scope.sugerido = "";
 
-        // Destination URL
-        var url = "http://www.gestionarturnos.com/upload.php";
-
-         //File for Upload
-        var targetPath = $scope.srcImage;
-
-         // File name only
-        var d = new Date();
-        tiempo = d.getTime();
-        var filename = tiempo.toString() + '.jpg';
-
-        var options = {
-            fileKey: "file",
-            fileName: filename,
-            chunkedMode: false,
-            mimeType: "image/jpg",
-            params : {'directory':'certificados', 'fileName':filename}
-        };
-
-       if($scope.srcImage==""){
-            var alertPopup = $ionicPopup.alert({
-            title: 'Debe tomar una foto de la orden para poder enviar la solicitud.',
+            $ionicHistory.nextViewOptions({
+              disableBack: true
             });
-        }else{
-            UserSrv.showLoading();
-            $cordovaFileTransfer.upload(url, targetPath, options).then(function (result) {
 
-                console.log("SUCCESS: " + JSON.stringify(result.response));
+            $state.go('menu.t_pendientes');
+          })
+          .error(function() {
+            UserSrv.hideLoadingerror("Encontramos un error al cargar tu solicitud, por favor intenta luego.");
+          });
 
-                $http.post( UserSrv.getPath() + "/altaEspecialidadEstudio.php", {'clinica':clinica,'dni':dni,'nafiliado':carnet,'sugerido':$scope.sugerido,'especialidad':$scope.especialidad,'tipo':'2','foto':filename})
-
-                .success(function() {
-
-                    UserSrv.hideLoadingerror("Tu solicitud fue enviada correctamente");
-                    $scope.sugerido = "";
-
-                    $ionicHistory.nextViewOptions({
-                        disableBack: true
-                    });
-
-                    $scope.confirmacion = " Debe tomar una foto";
-                    $scope.icon = "icon ion-close-round";
-                    $scope.color = "button-assertive"
-
-                    $state.go('menu.t_pendientes');
-                })
-
-            }, function (err) {
-
-                UserSrv.hideLoadingerror("Encontramos un problema al enviar su turno, verifique su conexion a internet e intente nuevamente");
-                console.log("ERROR: " + JSON.stringify(err));
-
-            }, function (progress) {
-                // PROGRESS HANDLING GOES HERE
-            });
-        }
-
-        // })
+      }, function(response) {
+        if (response.status > 0)
+          UserSrv.hideLoadingerror("Encontramos un problema al enviar su turno, verifique su conexion a internet e intente nuevamente");
+        console.log("ERROR: " + JSON.stringify(err));
+        $scope.errorMsg = response.status + ': ' + response.data;
+      }, function(evt) {
+        // Math.min is to fix IE which reports 200% sometimes
+        file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+      });
     }
+    // clinica = $stateParams.clinica;
+    // $scope.especialidad = $stateParams.especialidad;
+    // console.log($scope.especialidad);
+    // dni = UserSrv.getDNI();
+    // carnet = UserSrv.getNsocio();
+    // sugerido = $scope.sugerido;
+    // console.log($scope.especialidad);
+    //
+    // $scope.srcImage = "";
+    //
+    //$scope.listar = function() {
+    //   UserSrv.showLoading();
+    //   $http.post(UserSrv.getPath() + "/mostrarClinica.php", {
+    //       'clinica': clinica
+    //     })
+    //
+    //     .success(function(response) {
+    //       UserSrv.hideLoading();
+    //       $scope.clinica = response;
+    //       $scope.confirmacion = " Debe tomar una foto";
+    //       $scope.icon = "icon ion-close-round";
+    //       $scope.color = "button-assertive"
+    //     })
+    // }
+    //
+    // $scope.listar();
+    //
+    // $scope.tomarFoto = function() {
+    //
+    //   var options = {
+    //     quality: 80,
+    //     destinationType: Camera.DestinationType.DATA_URL,
+    //     sourceType: Camera.PictureSourceType.CAMERA,
+    //     allowEdit: true,
+    //     encodingType: Camera.EncodingType.JPEG,
+    //     targetWidth: 250,
+    //     targetHeight: 250,
+    //     popoverOptions: CameraPopoverOptions,
+    //     saveToPhotoAlbum: false
+    //   };
+    //
+    //   $cordovaCamera.getPicture(options).then(function(imageData) {
+    //     $scope.srcImage = "data:image/jpeg;base64," + imageData;
+    //     $scope.icon = "ion-checkmark-round";
+    //     $scope.color = "button-balanced";
+    //     $scope.confirmacion = " Enviar solicitud";
+    //
+    //   }, function(err) {
+    //     // error
+    //   });
+    //
+    // }
+    //
+    // $scope.enviar = function() {
+    //
+    //   // Destination URL
+    //   var url = "http://www.gestionarturnos.com/upload.php";
+    //
+    //   //File for Upload
+    //   var targetPath = $scope.srcImage;
+    //
+    //   // File name only
+    //   var d = new Date();
+    //   tiempo = d.getTime();
+    //   var filename = tiempo.toString() + '.jpg';
+    //
+    //   var options = {
+    //     fileKey: "file",
+    //     fileName: filename,
+    //     chunkedMode: false,
+    //     mimeType: "image/jpg",
+    //     params: {
+    //       'directory': 'certificados',
+    //       'fileName': filename
+    //     }
+    //   };
+    //
+    //   if ($scope.srcImage == "") {
+    //     var alertPopup = $ionicPopup.alert({
+    //       title: 'Debe tomar una foto de la orden para poder enviar la solicitud.',
+    //     });
+    //   } else {
+    //     UserSrv.showLoading();
+    //     $cordovaFileTransfer.upload(url, targetPath, options).then(function(result) {
+    //
+    //       console.log("SUCCESS: " + JSON.stringify(result.response));
+    //
+    //       $http.post(UserSrv.getPath() + "/altaEspecialidadEstudio.php", {
+    //           'clinica': clinica,
+    //           'dni': dni,
+    //           'nafiliado': carnet,
+    //           'sugerido': $scope.sugerido,
+    //           'especialidad': $scope.especialidad,
+    //           'tipo': '2',
+    //           'foto': filename
+    //         })
+    //
+    //         .success(function() {
+    //
+    //           UserSrv.hideLoadingerror("Tu solicitud fue enviada correctamente");
+    //           $scope.sugerido = "";
+    //
+    //           $ionicHistory.nextViewOptions({
+    //             disableBack: true
+    //           });
+    //
+    //           $scope.confirmacion = " Debe tomar una foto";
+    //           $scope.icon = "icon ion-close-round";
+    //           $scope.color = "button-assertive"
+    //
+    //           $state.go('menu.t_pendientes');
+    //         })
+    //
+    //     }, function(err) {
+    //
+    //       UserSrv.hideLoadingerror("Encontramos un problema al enviar su turno, verifique su conexion a internet e intente nuevamente");
+    //       console.log("ERROR: " + JSON.stringify(err));
+    //
+    //     }, function(progress) {
+    //       // PROGRESS HANDLING GOES HERE
+    //     });
+    //   }
+    //
+    //   // })
+    // }
 
-})
+  })
 
-.controller('solicitarEstudioCtrl', function($timeout,Upload,$scope,UserSrv,$stateParams,$state,$http,$ionicPopup,$ionicHistory,$cordovaCamera,$cordovaFileTransfer) {
+  .controller('solicitarEstudioCtrl', function($timeout, Upload, $scope, UserSrv, $stateParams, $state, $http, $ionicPopup, $ionicHistory, $cordovaCamera, $cordovaFileTransfer) {
 
     // clinica = $stateParams.clinica;
     // $scope.especialidad = $stateParams.especialidad;
-    dni = UserSrv.getDNI();
-    carnet = UserSrv.getNsocio();
-    sugerido = $scope.sugerido;
-    $scope.confirmacion = " Debe tomar una foto";
-    $scope.icon = "icon ion-close-round";
-    $scope.color = "button-assertive"
 
-    $scope.srcImage="";
+    $scope.uploadPic = function(file) {
 
-    // $scope.listar = function(){
+      var d = new Date();
+      tiempo = d.getTime();
+      var filename = tiempo.toString() + UserSrv.getDNI().toString() + '.jpg';
+      console.log('comienza a cargar la foto');
+      UserSrv.showLoading();
+
+      var filerenamed = Upload.rename(file, filename);
+      file.upload = Upload.upload({
+        url: 'http://www.gestionarturnos.com/uploadweb.php',
+        data: {
+          username: $scope.username,
+          file: filerenamed
+        },
+      });
+
+      file.upload.then(function(response) {
+
+        $http.post(UserSrv.getPath() + "/altaEstudio.php", {
+            'dni': UserSrv.getDNI(),
+            'nafiliado': UserSrv.getNsocio(),
+            'sugerido': $scope.sugerido,
+            'foto': filename
+          })
+
+          .success(function() {
+            UserSrv.hideLoadingerror("Tu solicitud fue enviada correctamente");
+            $scope.sugerido = "";
+
+            $ionicHistory.nextViewOptions({
+              disableBack: true
+            });
+
+            $state.go('menu.t_pendientes');
+          })
+          .error(function() {
+            UserSrv.hideLoadingerror("Encontramos un error al cargar tu solicitud, por favor intenta luego.");
+          });
+
+      }, function(response) {
+        if (response.status > 0)
+          UserSrv.hideLoadingerror("Encontramos un problema al enviar su turno, verifique su conexion a internet e intente nuevamente");
+        console.log("ERROR: " + JSON.stringify(err));
+        $scope.errorMsg = response.status + ': ' + response.data;
+      }, function(evt) {
+        // Math.min is to fix IE which reports 200% sometimes
+        file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+      });
+    }
+
+
+
+    // $scope.enviar = function() {
+    //
+    //   var url = "http://www.gestionarturnos.com/upload.php";
+    //
+    //   //File for Upload
+    //   var targetPath = $scope.srcImage;
+    //
+    //   // File name only
+    //   var d = new Date();
+    //   tiempo = d.getTime();
+    //   var filename = tiempo.toString() + '.jpg';
+    //
+    //   if ($scope.srcImage == "") {
+    //     var alertPopup = $ionicPopup.alert({
+    //       title: 'Debe tomar una foto de la orden para poder enviar la solicitud.',
+    //     });
+    //   } else {
     //     UserSrv.showLoading();
-    //     $http.post( UserSrv.getPath() + "/mostrarClinica.php", {'clinica':clinica})
-
-    //     .success(function(response) {
-    //         UserSrv.hideLoading();
-    //         $scope.clinica = response;
-    //         $scope.confirmacion = " Debe tomar una foto";
-    //         $scope.icon = "icon ion-close-round";
-    //         $scope.color = "button-assertive"
-    //     })
+    //     $cordovaFileTransfer.upload(url, targetPath, options).then(function(result) {
+    //
+    //       console.log("SUCCESS: " + JSON.stringify(result.response));
+    //
+    //       $http.post(UserSrv.getPath() + "/altaEstudio.php", {
+    //           'dni': dni,
+    //           'nafiliado': carnet,
+    //           'sugerido': $scope.sugerido,
+    //           'foto': filename
+    //         })
+    //
+    //         .success(function() {
+    //
+    //           UserSrv.hideLoadingerror("Tu solicitud fue enviada correctamente");
+    //           $scope.sugerido = "";
+    //
+    //           $ionicHistory.nextViewOptions({
+    //             disableBack: true
+    //           });
+    //
+    //           $scope.confirmacion = " Debe tomar una foto";
+    //           $scope.icon = "icon ion-close-round";
+    //           $scope.color = "button-assertive"
+    //
+    //           $state.go('menu.t_pendientes');
+    //         })
+    //
+    //     }, function(err) {
+    //
+    //       UserSrv.hideLoadingerror("Encontramos un problema al enviar su turno, verifique su conexion a internet e intente nuevamente");
+    //       console.log("ERROR: " + JSON.stringify(err));
+    //
+    //     }, function(progress) {
+    //       // PROGRESS HANDLING GOES HERE
+    //     });
+    //   }
+    //
     // }
-    // http://jsfiddle.net/danialfarid/0mz6ff9o/135/
-    $scope.uploadFiles = function(file, errFiles) {
-      file.progress = 0
-      $scope.f = file;
-      $scope.errFile = errFiles && errFiles[0];
-      if (file) {
+  })
 
-          file.upload = Upload.upload({
-              url: 'http://www.gestionarturnos.com/uploadweb.php',
-              data: {file: file}
-          });
+  .controller('seleccionEstudioCtrl', function($scope, $http, $state, $stateParams, UserSrv, $ionicHistory, $location) {
 
-          file.upload.then(function (response) {
-              $timeout(function () {
-                  file.result = response.data;
-              });
-          }, function (response) {
-              if (response.status > 0)
-                  $scope.errorMsg = response.status + ': ' + response.data;
-          }, function (evt) {
-              file.progress = Math.min(100, parseInt(100.0 *
-                                       evt.loaded / evt.total));
-          });
-      }
-  }
-
-
-
-
-
-  //   $scope.uploadFiles = function(file, errFiles) {
-  //     console.log("entro al uploadFiles");
-	// 		// File name only
-	// 	 var d = new Date();
-	// 	 tiempo = d.getTime();
-	// 	 var filename = tiempo.toString() + '.jpg';
-  //
-  //   $scope.f = file;
-  //   $scope.errFile = errFiles && errFiles[0];
-  //
-  //   if (file) {
-  //     console.log('entro al file');
-  //     file.upload = Upload.upload({
-  //       url: 'http://www.gestionarturnos.com/uploadweb.php',
-  //       data: {
-  //       file: file
-  //       }
-  //     });
-  //
-  //     file.upload.then(function(response) {
-  //       $timeout(function() {
-  //         file.result = response.data;
-  //       });
-  //     }, function(response) {
-  //       if (response.status > 0)
-  //         $scope.errorMsg = response.status + ': ' + response.data;
-  //         console.log($scope.errorMsg);
-  //     }, function(evt) {
-  //       file.progress = Math.min(100, parseInt(100.0 *
-  //         evt.loaded / evt.total));
-  //     });
-  //   }
-  // }
-
-
-    $scope.enviar = function(){
-
-       var url = "http://www.gestionarturnos.com/upload.php";
-
-         //File for Upload
-        var targetPath = $scope.srcImage;
-
-         // File name only
-        var d = new Date();
-        tiempo = d.getTime();
-        var filename = tiempo.toString() + '.jpg';
-
-        var options = {
-            fileKey: "file",
-            fileName: filename,
-            chunkedMode: false,
-            mimeType: "image/jpg",
-            params : {'directory':'certificados', 'fileName':filename}
-        };
-
-       if($scope.srcImage==""){
-            var alertPopup = $ionicPopup.alert({
-            title: 'Debe tomar una foto de la orden para poder enviar la solicitud.',
-            });
-        }else{
-            UserSrv.showLoading();
-            $cordovaFileTransfer.upload(url, targetPath, options).then(function (result) {
-
-                console.log("SUCCESS: " + JSON.stringify(result.response));
-
-                $http.post( UserSrv.getPath() + "/altaEstudio.php", {'dni':dni,'nafiliado':carnet,'sugerido':$scope.sugerido,'foto':filename})
-
-                .success(function() {
-
-                    UserSrv.hideLoadingerror("Tu solicitud fue enviada correctamente");
-                    $scope.sugerido = "";
-
-                    $ionicHistory.nextViewOptions({
-                        disableBack: true
-                    });
-
-                    $scope.confirmacion = " Debe tomar una foto";
-                    $scope.icon = "icon ion-close-round";
-                    $scope.color = "button-assertive"
-
-                    $state.go('menu.t_pendientes');
-                })
-
-            }, function (err) {
-
-                UserSrv.hideLoadingerror("Encontramos un problema al enviar su turno, verifique su conexion a internet e intente nuevamente");
-                console.log("ERROR: " + JSON.stringify(err));
-
-            }, function (progress) {
-                // PROGRESS HANDLING GOES HERE
-            });
-        }
-
-    }
-
-    $scope.tomarFoto = function(){
-
-        var options = {
-            quality: 80,
-            destinationType: Camera.DestinationType.DATA_URL,
-            sourceType: Camera.PictureSourceType.CAMERA,
-            allowEdit: true,
-            encodingType: Camera.EncodingType.JPEG,
-            targetWidth: 250,
-            targetHeight: 250,
-            popoverOptions: CameraPopoverOptions,
-            saveToPhotoAlbum: false
-        };
-
-        $cordovaCamera.getPicture(options).then(function(imageData) {
-            $scope.srcImage = "data:image/jpeg;base64," + imageData;
-            $scope.icon="ion-checkmark-round";
-            $scope.color="button-balanced";
-            $scope.confirmacion=" Enviar solicitud";
-        }, function(err) {
-            // error
-        });
-    }
-
-})
-
-.controller('seleccionEstudioCtrl', function($scope,$http,$state,$stateParams,UserSrv,$ionicHistory,$location) {
-
-    $scope.listarEstudios = function(){
-        UserSrv.showLoading();
-        $http.post( UserSrv.getPath() + "/listarEspecialidadoEstudio.php", {'tipo':'estudio'})
+    $scope.listarEstudios = function() {
+      UserSrv.showLoading();
+      $http.post(UserSrv.getPath() + "/listarEspecialidadoEstudio.php", {
+          'tipo': 'estudio'
+        })
 
 
         .success(function(response) {
-            UserSrv.hideLoading();
-            $scope.estudios = response;
+          UserSrv.hideLoading();
+          $scope.estudios = response;
         })
     }
 
-    $scope.refresh = function(){
-        $http.post( UserSrv.getPath() + "/listarEspecialidadoEstudio.php", {'tipo':'estudio'})
+    $scope.refresh = function() {
+      $http.post(UserSrv.getPath() + "/listarEspecialidadoEstudio.php", {
+          'tipo': 'estudio'
+        })
 
         .success(function(response) {
-            $scope.estudios = response;
+          $scope.estudios = response;
         })
     }
 
@@ -991,15 +1135,18 @@ angular.module('app.controllers', [])
 
     $scope.doRefresh = function() {
 
-        console.log('Refreshing!');
+      console.log('Refreshing!');
 
-        $scope.refresh();
-        $scope.$broadcast('scroll.refreshComplete');
+      $scope.refresh();
+      $scope.$broadcast('scroll.refreshComplete');
     };
 
 
-    $scope.elegirEstudio= function(estudio){
-        $state.go('menu.busquedaPorPartido', {especialidad:estudio,tipo:'3'});
+    $scope.elegirEstudio = function(estudio) {
+      $state.go('menu.busquedaPorPartido', {
+        especialidad: estudio,
+        tipo: '3'
+      });
     }
 
-})
+  })

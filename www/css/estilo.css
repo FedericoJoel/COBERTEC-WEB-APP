@@ -10,3 +10,11 @@
 .logo{
 	margin-top: 10%;
 }
+
+.thumb {
+    width: 100px;
+    height: 100px;
+    float: none;
+    position: relative;
+    top: 7px;
+}
